@@ -1,3 +1,17 @@
+/// C# SDK for Xooa
+/// 
+/// Copyright 2018 Xooa
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+/// in compliance with the License. You may obtain a copy of the License at:
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+/// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+/// for the specific language governing permissions and limitations under the License.
+///
+/// Author: Kavi Sarna
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,7 +57,7 @@ namespace XooaSDK.Client {
         public void setAppUrl(string appUrl) {
             
             if (string.IsNullOrWhiteSpace(appUrl))
-                throw new ArgumentException("The provided basePath is invalid.", "basePath");
+                throw new ArgumentException("The provided App URL is invalid.");
 
             this.appUrl = appUrl;
 
@@ -66,10 +80,10 @@ namespace XooaSDK.Client {
         /// </summary>
        public XooaClient() {
 
-            appUrl  = "https://api.ci.xooa.io/api/v1/";
+            appUrl  = "https://api.xooa.com/api/v1/";
 
             // Setting Timeout has side effects (forces ApiClient creation).
-            timeout = 1000;
+            timeout = 4000;
 
             this.restClient = new RestClient(appUrl);
         }
@@ -79,7 +93,7 @@ namespace XooaSDK.Client {
         /// </summary>
         /// <param name="apiToken">API Token for the Identity.</param>
         /// <param name="appUrl">App URl to connect to.</param>
-        public XooaClient(string apiToken, string appUrl = "https://api.ci.xooa.io") {
+        public XooaClient(string apiToken, string appUrl = "https://api.xooa.com/api/v1/") {
             
             if (string.IsNullOrWhiteSpace(appUrl))
                 throw new ArgumentException("The provided basePath is invalid.", "basePath");
@@ -108,23 +122,10 @@ namespace XooaSDK.Client {
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
         /// <param name="callback">Callback function to apply to the response.</param>
-        public void subscribeAllEvents(Action<object> callback) {
+        public void subscribeEvents(Action<object> callback) {
             
             this.webSocket = new WebSocket(apiToken);
-            webSocket.subscribeEvents("-1", callback);
-        }
-
-        /// <summary>
-        /// Subscribe to the events matching the regex on the blockchain.
-        /// </summary>
-        /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
-        /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
-        /// <param name="regex">Regex to check for the events to subscribe to.</param>
-        /// <param name="callback">Callback function to apply to the response.</param>
-        public void subscribeEvents(string regex, Action<object> callback) {
-            
-            this.webSocket = new WebSocket(apiToken);
-            webSocket.subscribeEvents(regex, callback);
+            webSocket.subscribeEvents(callback);
         }
 
         /// <summary>
@@ -140,8 +141,7 @@ namespace XooaSDK.Client {
 
 
         /// <summary>
-        /// Get block data for the latestblock.
-        /// Get specific block information such as previous block hash, data hash, # of transactions
+        /// Use this endpoint to Get the block number and hashes of current (highest) block in the network.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -153,8 +153,7 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get block data for the latest block in async mode.
-        /// Get specific block information such as previous block hash, data hash, # of transactions
+        /// Use this endpoint to Get the block number and hashes of current (highest) block in the network
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <returns>PendingTransactionResponse giving the resultId for the transaction.</returns>
@@ -164,8 +163,7 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get block data for the given block number.
-        /// Get specific block information such as previous block hash, data hash, # of transactions
+        /// Use this endpoint to Get the number of transactions and hashes of a specific block in the network parameters
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -178,8 +176,7 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get block data for the given block number.
-        /// Get specific block information such as previous block hash, data hash, # of transactions
+        /// Use this endpoint to Get the number of transactions and hashes of a specific block in the network parameters
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="blockNumber">Block number to fetch data</param>
@@ -189,8 +186,34 @@ namespace XooaSDK.Client {
             return new BlockchainApi(restClient, apiToken).getBlockByNumberAsync(blockNumber);
         }
 
+        /// <summary>
+        /// Use this endpoint to Get transaction by transaction id.
+        /// </summary>
+        /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
+        /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
+        /// <param name="transactionId">Transaction Id to fetch data</param>
+        /// <param name="timeout">Timeout interval for transaction.</param>
+        /// <returns>TransactionResponse giving the data about the transaction.</returns>
+        public TransactionResponse getTransactionByTransactionId(string transactionId, string timeout = "3000") {
+
+            new BlockchainApi(restClient, apiToken);
+            return null;
+        }
+
+        /// <summary>
+        /// Use this endpoint to Get transaction by transaction id.
+        /// </summary>
+        /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
+        /// <param name="transactionId">Transaction Id to fetch data</param>
+        /// <returns>PendingTransactionResponse giving the resultId for the transaction.</returns>
+        public PendingTransactionResponse getTransactionByTransactionIdAsync(string transactionId) {
+
+            new BlockchainApi(restClient, apiToken);
+            return null;
+        }
+
 		/// <summary>
-        /// Get the current identity data with which the user is logged in.
+        /// This endpoint returns authenticated identity information
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -202,7 +225,8 @@ namespace XooaSDK.Client {
         }
 		
 		/// <summary>
-        /// Get the list of all the identities available.
+        /// Get all identities from the identity registry
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -214,7 +238,15 @@ namespace XooaSDK.Client {
         }
 
 		/// <summary>
-        /// Enroll a new Identity with the app.
+        /// The Enroll identity endpoint is used to enroll new identities for the smart contract app. 
+        /// A success response includes the API Token generated for the identity. 
+        /// This API Token can be used to call API End points on behalf of the enrolled identity.
+        /// 
+        /// This endpoint provides equivalent functionality to adding new identity manually using Xooa console,
+        /// and identities added using this endpoint will appear, and can be managed,
+        /// using Xooa console under the identities tab of the smart contract app.
+        ///
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -227,7 +259,15 @@ namespace XooaSDK.Client {
         }
 		
 		/// <summary>
-        /// Enroll a new Identity with the app in async mode.
+        /// The Enroll identity endpoint is used to enroll new identities for the smart contract app.
+        /// A success response includes the API Token generated for the identity.
+        /// This API Token can be used to call API End points on behalf of the enrolled identity.
+        ///
+        /// This endpoint provides equivalent functionality to adding new identity manually using Xooa console,
+        /// and identities added using this endpoint will appear, and can be managed,
+        /// using Xooa console under the identities tab of the smart contract app
+        ///
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="IdentityRequest">Identity Data to enroll.</param>
@@ -238,7 +278,9 @@ namespace XooaSDK.Client {
         }
 		
 		/// <summary>
-        /// Regenerate the API token for the identity Id.
+        /// Generates new identity API Token.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -251,7 +293,9 @@ namespace XooaSDK.Client {
         }
 		
 		/// <summary>
-        /// Get the identity data.
+        /// Get the specified identity from the identity registry.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -264,7 +308,9 @@ namespace XooaSDK.Client {
         }
 		
 		/// <summary>
-        /// Delete the identity.
+        /// Deletes an identity.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -277,8 +323,19 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get QueryResponse for the function and arguments.
-        /// Get payload information 
+        /// The query API endpoint is used for querying (reading) a blockchain ledger using smart contract function.
+        /// The endpoint must call a function already defined in your smart contract app which will process the query request.
+        /// The function name is part of the endpoint URL, or can be entered as the fcn parameter when testing using the Sandbox.
+        /// The function arguments (number of arguments and type) is determined by the smart contract.
+        /// The smart contract is responsible for validation and exception management.
+        /// In case of error the smart contract is responsible for returning the proper http error code.
+        /// When exception happens, and it is not caught by smart contract or if caught and no http status code is returned,
+        /// the API gateway will return http-status-code 500 to the client app. 
+        ///
+        /// For example, if testing the sample get-set smart contract app, enter ‘get’ (without quotes) as the value for fcn. 
+        /// 
+        /// The response body is also determined by the smart contract app, and that’s also the reason why a consistent 
+        /// response sample is unavailable for this endpoint. A success response may be either 200 or 202. 
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -286,27 +343,50 @@ namespace XooaSDK.Client {
         /// <param name="args">Arguments to query.</param>
         /// <param name="timeout">Timeout interval for transaction.</param>
         /// <returns>QueryResponse giving the payload for the argument.</returns>
-        public QueryResponse query(string functionName, string args = null, string timeout = "3000") {
+        public QueryResponse query(string functionName, string[] args, string timeout = "3000") {
 
             return new QueryApi(restClient, apiToken).query(functionName, args, timeout);
         }
 
         /// <summary>
-        /// Get QueryResponse for the function and arguments.
-        /// Get payload information 
+        /// The query API endpoint is used for querying (reading) a blockchain ledger using smart contract function.
+        /// The endpoint must call a function already defined in your smart contract app which will process the query request.
+        /// The function name is part of the endpoint URL, or can be entered as the fcn parameter when testing using the Sandbox.
+        /// The function arguments (number of arguments and type) is determined by the smart contract.
+        /// The smart contract is responsible for validation and exception management.
+        /// In case of error the smart contract is responsible for returning the proper http error code.
+        /// When exception happens, and it is not caught by smart contract or if caught and no http status code is returned,
+        /// the API gateway will return http-status-code 500 to the client app. 
+        ///
+        /// For example, if testing the sample get-set smart contract app, enter ‘get’ (without quotes) as the value for fcn. 
+        /// 
+        /// The response body is also determined by the smart contract app, and that’s also the reason why a consistent 
+        /// response sample is unavailable for this endpoint. A success response may be either 200 or 202. 
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="functionName">Function Name to Query.</param>
         /// <param name="args">Arguments for the Query.</param>
         /// <returns>PendingTransactionResponse giving the resultId and resultUrl.</returns>
-        public PendingTransactionResponse queryAsync(string functionName, string args = null) {
+        public PendingTransactionResponse queryAsync(string functionName, string[] args) {
 
             return new QueryApi(restClient, apiToken).queryAsync(functionName, args);
         }
 
         /// <summary>
-        /// Get InvokeResponse for the function and arguments.
-        /// Get payload information 
+        /// The invoke API endpoint is used for submitting transaction for processing by the blockchain smart contract app 
+        /// when the transaction payload need to be persisted into the Ledger (new block is mined).
+        /// The endpoint must call a function already defined in your smart contract app which will process the invoke request.
+        /// The function name is part of the endpoint URL, or can be entered as the fcn parameter when testing using the Sandbox.
+        /// For example, if testing the sample get-set smart contract app, use ‘set’ (without quotes) as the value for fcn. 
+        /// The function arguments (number of arguments and type) is determined by the smart contract.
+        /// The smart contract is also responsible for arguments validation and exception management.
+        /// In case of error the smart contract is responsible for returning the proper http error code.
+        /// When exception happens, and it is not caught by smart contract or if caught and no http status code is returned,
+        /// the API gateway will return http-status-code 500 to the client app.
+        /// 
+        /// The payload of Invoke Transaction Response in case of final response is determined by the smart contract app.
+        /// 
+        /// A success response may be either 200 or 202.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -320,8 +400,20 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get InvokeResponse for the function and arguments.
-        /// Get payload information 
+        /// The invoke API endpoint is used for submitting transaction for processing by the blockchain smart contract app 
+        /// when the transaction payload need to be persisted into the Ledger (new block is mined).
+        /// The endpoint must call a function already defined in your smart contract app which will process the invoke request.
+        /// The function name is part of the endpoint URL, or can be entered as the fcn parameter when testing using the Sandbox.
+        /// For example, if testing the sample get-set smart contract app, use ‘set’ (without quotes) as the value for fcn. 
+        /// The function arguments (number of arguments and type) is determined by the smart contract.
+        /// The smart contract is also responsible for arguments validation and exception management.
+        /// In case of error the smart contract is responsible for returning the proper http error code.
+        /// When exception happens, and it is not caught by smart contract or if caught and no http status code is returned,
+        /// the API gateway will return http-status-code 500 to the client app.
+        /// 
+        /// The payload of Invoke Transaction Response in case of final response is determined by the smart contract app.
+        /// 
+        /// A success response may be either 200 or 202.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="functionName">Function Name to invoke.</param>
@@ -333,7 +425,7 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get QueryResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -345,7 +437,7 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get InvokeResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -357,7 +449,7 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get IdentityResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -369,7 +461,7 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get CurrentBlockResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -381,7 +473,7 @@ namespace XooaSDK.Client {
         }
 
         /// <summary>
-        /// Get BlockResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -390,6 +482,18 @@ namespace XooaSDK.Client {
         public BlockResponse getResultForBlockByNumber(string resultId, string timeout = "3000") {
 			
             return new ResultApi(restClient, apiToken).getResultForBlockByNumber(resultId, timeout);
+        }
+
+        /// <summary>
+        /// This endpoint returns the result of previously submitted api request.
+        /// </summary>
+        /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
+        /// <param name="resultId">Result Id of the transaction to fetch data.</param>
+        /// <param name="timeout">Timeout interval for transaction.</param>
+        /// <returns>TransactionResponse giving the data about the transaction.</returns>
+        public TransactionResponse getResultForTransaction(string resultId, string timeout = "3000") {
+
+            return new ResultApi(restClient, apiToken).getResultForTransaction(resultId, timeout);
         }
     }
 }

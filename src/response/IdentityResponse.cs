@@ -1,3 +1,17 @@
+/// C# SDK for Xooa
+/// 
+/// Copyright 2018 Xooa
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+/// in compliance with the License. You may obtain a copy of the License at:
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+/// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+/// for the specific language governing permissions and limitations under the License.
+///
+/// Author: Kavi Sarna
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -122,11 +136,11 @@ namespace XooaSDK.Client.Response {
         /// <param name="apiToken">API Token.</param>
         /// <param name="id">Id.</param>
         public IdentityResponse(string identityName, bool canManageIdentities, string createdAt,
-            string apiToken, string id) {
+             string id) {
                 this.identityName = identityName;
                 this.canManageIdentities = canManageIdentities;
                 this.createdAt = createdAt;
-                this.apiToken = apiToken;
+            //    this.apiToken = apiToken;
                 this.id = id;
         }
 
@@ -217,9 +231,9 @@ namespace XooaSDK.Client.Response {
         /// </summary>
         public string toString() {
             string attributString = "{\"name\" : \"" + this.name 
-                + "\", \"ecert\" : " + this.ecert + ", \"value\" : \"" + this.value + "\"}" ;
-
-            return null;
+                + "\", \"ecert\" : " + this.ecert.ToString().ToLower() + ", \"value\" : \"" + this.value + "\"}" ;
+            
+            return attributString;
         }
     }
 }

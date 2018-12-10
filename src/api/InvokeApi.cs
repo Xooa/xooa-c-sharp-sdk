@@ -1,3 +1,17 @@
+/// C# SDK for Xooa
+/// 
+/// Copyright 2018 Xooa
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+/// in compliance with the License. You may obtain a copy of the License at:
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+/// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+/// for the specific language governing permissions and limitations under the License.
+///
+/// Author: Kavi Sarna
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,23 +27,47 @@ namespace XooaSDK.Client.Api {
     public interface IInvokeApi {
         
         /// <summary>
-        /// Get InvokeResponse for the function and arguments.
-        /// Get payload information 
+        /// The invoke API endpoint is used for submitting transaction for processing by the blockchain smart contract app 
+        /// when the transaction payload need to be persisted into the Ledger (new block is mined).
+        /// The endpoint must call a function already defined in your smart contract app which will process the invoke request.
+        /// The function name is part of the endpoint URL, or can be entered as the fcn parameter when testing using the Sandbox.
+        /// For example, if testing the sample get-set smart contract app, use ‘set’ (without quotes) as the value for fcn. 
+        /// The function arguments (number of arguments and type) is determined by the smart contract.
+        /// The smart contract is also responsible for arguments validation and exception management.
+        /// In case of error the smart contract is responsible for returning the proper http error code.
+        /// When exception happens, and it is not caught by smart contract or if caught and no http status code is returned,
+        /// the API gateway will return http-status-code 500 to the client app.
+        /// 
+        /// The payload of Invoke Transaction Response in case of final response is determined by the smart contract app.
+        /// 
+        /// A success response may be either 200 or 202.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
-        /// <param name="functionName">Function to Invoke.</param>
-        /// <param name="args">Arguments for the transaction.</param>
+        /// <param name="functionName">Function Name to invoke.</param>
+        /// <param name="args">Arguments to invoke in transaction.</param>
         /// <param name="timeout">Timeout interval for transaction.</param>
         /// <returns>InvokeResponse giving the payload for the argument.</returns>
         InvokeResponse invoke(String functionName, string[] args, string timeout);
 
         /// <summary>
-        /// Get InvokeResponse for the function and arguments.
-        /// Get payload information 
+        /// The invoke API endpoint is used for submitting transaction for processing by the blockchain smart contract app 
+        /// when the transaction payload need to be persisted into the Ledger (new block is mined).
+        /// The endpoint must call a function already defined in your smart contract app which will process the invoke request.
+        /// The function name is part of the endpoint URL, or can be entered as the fcn parameter when testing using the Sandbox.
+        /// For example, if testing the sample get-set smart contract app, use ‘set’ (without quotes) as the value for fcn. 
+        /// The function arguments (number of arguments and type) is determined by the smart contract.
+        /// The smart contract is also responsible for arguments validation and exception management.
+        /// In case of error the smart contract is responsible for returning the proper http error code.
+        /// When exception happens, and it is not caught by smart contract or if caught and no http status code is returned,
+        /// the API gateway will return http-status-code 500 to the client app.
+        /// 
+        /// The payload of Invoke Transaction Response in case of final response is determined by the smart contract app.
+        /// 
+        /// A success response may be either 200 or 202.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
-        /// <param name="functionName">Function to Invoke.</param>
+        /// <param name="functionName">Function Name to invoke.</param>
         /// <param name="args">Arguments for the transaction.</param>
         /// <returns>PendingTransactionResponse giving the resultId and resultUrl.</returns>
         PendingTransactionResponse invokeAsync(String functionName, string[] args);
@@ -60,13 +98,25 @@ namespace XooaSDK.Client.Api {
         }
 
         /// <summary>
-        /// Get InvokeResponse for the function and arguments.
-        /// Get payload information 
+        /// The invoke API endpoint is used for submitting transaction for processing by the blockchain smart contract app 
+        /// when the transaction payload need to be persisted into the Ledger (new block is mined).
+        /// The endpoint must call a function already defined in your smart contract app which will process the invoke request.
+        /// The function name is part of the endpoint URL, or can be entered as the fcn parameter when testing using the Sandbox.
+        /// For example, if testing the sample get-set smart contract app, use ‘set’ (without quotes) as the value for fcn. 
+        /// The function arguments (number of arguments and type) is determined by the smart contract.
+        /// The smart contract is also responsible for arguments validation and exception management.
+        /// In case of error the smart contract is responsible for returning the proper http error code.
+        /// When exception happens, and it is not caught by smart contract or if caught and no http status code is returned,
+        /// the API gateway will return http-status-code 500 to the client app.
+        /// 
+        /// The payload of Invoke Transaction Response in case of final response is determined by the smart contract app.
+        /// 
+        /// A success response may be either 200 or 202.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
-        /// <param name="functionName">Function to Invoke.</param>
-        /// <param name="args">Arguments for the transaction.</param>
+        /// <param name="functionName">Function Name to invoke.</param>
+        /// <param name="args">Arguments to invoke in transaction.</param>
         /// <param name="timeout">Timeout interval for transaction.</param>
         /// <returns>InvokeResponse giving the payload for the argument.</returns>
         public InvokeResponse invoke(string functionName, string[] args = null, string timeout = "3000") {
@@ -91,7 +141,24 @@ namespace XooaSDK.Client.Api {
             var localVarPathParams = new Dictionary<string, string>();
             localVarPathParams.Add("fcn", functionName);
 
-            string jsonData = "{\"args\":[\"" + args[0] + "\", \"" + args[1] + "\"]}";
+            // string jsonData = "[";
+
+            // foreach ( string argument in args) {
+            //     jsonData += "\"" + argument + "\", ";
+            // }
+
+            // jsonData = jsonData.Substring(0, jsonData.Length-2) + "]";
+
+            string jsonData = "[\"";
+
+            for (int i = 0; i < args.Length; i++) {
+                jsonData += args[i];
+
+                if (i != args.Length -1) {
+                    jsonData += "\", \"";
+                }
+            }
+            jsonData += "\"]";
 
             int statusCode = 0;
 
@@ -100,47 +167,15 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.POST, localVarQueryParameters, jsonData, localVarHeaderParams,
                     null, localVarPathParams, contentType);
                 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
 
-                if (statusCode == 200) {
-
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
-
-                    var details = JObject.Parse(data);
-
-                    InvokeResponse invokeResponse = new InvokeResponse(
-                        details["txId"].ToString(), details["payload"].ToString());
+                InvokeResponse invokeResponse = new InvokeResponse(
+                    details["txId"].ToString(), details["payload"].ToString());
                     
-                    return invokeResponse;
+                return invokeResponse;
                 
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(),
-                        details["resultURL"].ToString());
-                    
-                } else {
-
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
-                }
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;
@@ -154,11 +189,23 @@ namespace XooaSDK.Client.Api {
         }
 
         /// <summary>
-        /// Get InvokeResponse for the function and arguments.
-        /// Get payload information 
+        /// The invoke API endpoint is used for submitting transaction for processing by the blockchain smart contract app 
+        /// when the transaction payload need to be persisted into the Ledger (new block is mined).
+        /// The endpoint must call a function already defined in your smart contract app which will process the invoke request.
+        /// The function name is part of the endpoint URL, or can be entered as the fcn parameter when testing using the Sandbox.
+        /// For example, if testing the sample get-set smart contract app, use ‘set’ (without quotes) as the value for fcn. 
+        /// The function arguments (number of arguments and type) is determined by the smart contract.
+        /// The smart contract is also responsible for arguments validation and exception management.
+        /// In case of error the smart contract is responsible for returning the proper http error code.
+        /// When exception happens, and it is not caught by smart contract or if caught and no http status code is returned,
+        /// the API gateway will return http-status-code 500 to the client app.
+        /// 
+        /// The payload of Invoke Transaction Response in case of final response is determined by the smart contract app.
+        /// 
+        /// A success response may be either 200 or 202.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
-        /// <param name="functionName">Function to Invoke.</param>
+        /// <param name="functionName">Function Name to invoke.</param>
         /// <param name="args">Arguments for the transaction.</param>
         /// <returns>PendingTransactionResponse giving the resultId and resultUrl.</returns>
         public PendingTransactionResponse invokeAsync(string functionName, string[] args = null) {
@@ -182,7 +229,24 @@ namespace XooaSDK.Client.Api {
             var localVarPathParams = new Dictionary<string, string>();
             localVarPathParams.Add("fcn", functionName);
 
-            string jsonData = "{\"args\":[\"" + args[0] + "\", \"" + args[1] + "\"]}";
+            // string jsonData = "[";
+
+            // foreach ( string argument in args) {
+            //     jsonData += "\"" + argument + "\", ";
+            // }
+
+            // jsonData = jsonData.Substring(0, jsonData.Length-2) + "]";
+
+            string jsonData = "[\"";
+
+            for (int i = 0; i < args.Length; i++) {
+                jsonData += args[i];
+
+                if (i != args.Length -1) {
+                    jsonData += "\", \"";
+                }
+            }
+            jsonData += "\"]";
 
             int statusCode = 0;
 
@@ -191,38 +255,15 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.POST, localVarQueryParameters, jsonData, localVarHeaderParams,
                     null, localVarPathParams, contentType);
                 
-                var response = RestClient.ExecuteTaskAsync(request).Result;
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
-
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
-
-                if (statusCode == 200) {
-
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
-
-                    var details = JObject.Parse(data);
-
-                    PendingTransactionResponse pendingTransactionResponse = new PendingTransactionResponse(
-                        details["resultId"].ToString(), details["resultURL"].ToString());
-
-                    return pendingTransactionResponse;
+                IRestResponse response = RestClient.ExecuteTaskAsync(request).Result;
                 
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-                    
-                    try {
-                        var details = JObject.Parse(data);
+                JObject details = XooaSDK.Client.Util.Request.getDataAsync(response);
+                
+                PendingTransactionResponse pendingTransactionResponse = new PendingTransactionResponse(
+                    details["resultId"].ToString(), details["resultURL"].ToString());
 
-                        throw new XooaApiException(statusCode, details["error"].ToString());
+                return pendingTransactionResponse;
 
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
-                }
             } catch (XooaApiException xae) {
                 Log.Error(xae);
                 throw xae;

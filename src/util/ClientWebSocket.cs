@@ -1,4 +1,18 @@
-﻿using System;
+﻿/// C# SDK for Xooa
+/// 
+/// Copyright 2018 Xooa
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+/// in compliance with the License. You may obtain a copy of the License at:
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+/// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+/// for the specific language governing permissions and limitations under the License.
+///
+/// Author: Kavi Sarna
+
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
@@ -47,14 +61,14 @@ namespace XooaSDK.Client.Util {
         /// </summary>
         /// <param name="regex">Regular Expression to define which events to subscribe to.</param>
         /// <param name="callback">Callback function to define the action on the received event.</param>
-        public void subscribeEvents(String regex, Action<object> callback) {
+        public void subscribeEvents(Action<object> callback) {
 
             int retryCount = 0;
 
             string json = "{\"token\" : \"" + apiToken + "\"}";
 
             var opts = new IO.Options {Path = "/subscribe"};
-            socket = IO.Socket("https://api.ci.xooa.io", opts);
+            socket = IO.Socket("https://api.staging.xooa.io", opts);
 
             Console.WriteLine(socket.GetHashCode());
 
@@ -89,22 +103,20 @@ namespace XooaSDK.Client.Util {
                 }
             });
 
+            socket.On(Socket.EVENT_MESSAGE, (data) => {
+                Console.WriteLine("Message");
+                Console.WriteLine(data);
+            });
+
             socket.On("event", (data) =>
             {   
+                Console.WriteLine("event");
+                Console.WriteLine(data);
                 JObject jsonData = JObject.Parse(data.ToString());
-
-                if (regex == "-1") {
+                
                     Console.WriteLine(data);
                     callback(jsonData);
-                } else {
-                    Regex re = new Regex(regex);
-                    MatchCollection matches = re.Matches(jsonData["eventName"].ToString());
-
-                    if (matches.Count > 0) {
-                        Console.WriteLine(data);
-                        callback(jsonData);
-                    }   
-                }
+                
             });
         }
 

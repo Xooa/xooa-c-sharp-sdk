@@ -1,3 +1,17 @@
+/// C# SDK for Xooa
+/// 
+/// Copyright 2018 Xooa
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+/// in compliance with the License. You may obtain a copy of the License at:
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+/// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+/// for the specific language governing permissions and limitations under the License.
+///
+/// Author: Kavi Sarna
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +27,7 @@ namespace XooaSDK.Client.Api {
     public interface IResultApi {
 
         /// <summary>
-        /// Get QueryResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -22,7 +36,7 @@ namespace XooaSDK.Client.Api {
         QueryResponse getResultForQuery(string resultId, string timeout);
 
         /// <summary>
-        /// Get InvokeResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -31,7 +45,7 @@ namespace XooaSDK.Client.Api {
         InvokeResponse getResultForInvoke(string resultId, string timeout);
 
         /// <summary>
-        /// Get IdentityResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -40,7 +54,7 @@ namespace XooaSDK.Client.Api {
         IdentityResponse getResultForIdentity(string resultId, string timeout);
 
         /// <summary>
-        /// Get CurrentBlockResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
@@ -49,13 +63,22 @@ namespace XooaSDK.Client.Api {
         CurrentBlockResponse getResultForCurrentBlock(string resultId, string timeout);
 
         /// <summary>
-        /// Get BlockResponse data for the Result Id.
+        /// This endpoint returns the result of previously submitted api request.
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <param name="resultId">Result Id of the transaction to fetch data.</param>
         /// <param name="timeout">Timeout interval for transaction.</param>
         /// <returns>BlockResponse giving the data about the BlockByNumber request.</returns>
         BlockResponse getResultForBlockByNumber(string resultId, string timeout);
+
+        /// <summary>
+        /// This endpoint returns the result of previously submitted api request.
+        /// </summary>
+        /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
+        /// <param name="resultId">Result Id of the transaction to fetch data.</param>
+        /// <param name="timeout">Timeout interval for transaction.</param>
+        /// <returns>TransactionResponse giving the data about the transaction.</returns>
+        TransactionResponse getResultForTransaction(string resultId, string timeout);
     }
 
     public class ResultApi : IResultApi {
@@ -114,46 +137,16 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams, 
                     null, localVarPathParams, contentType);
                 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
 
-                if (statusCode == 200) {
+                var payload = details["result"];
 
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                QueryResponse queryResponse = new QueryResponse(payload.ToString());
 
-                    var details = JObject.Parse(data);
-                    var payload = details["payload"];
-
-                    QueryResponse queryResponse = new QueryResponse(payload["payload"].ToString());
-
-                    return queryResponse;
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(),
-                        details["resultURL"].ToString());
-                    
-                } else {
-
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-
-                    } catch(System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
-                }
+                return queryResponse;
+                
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;
@@ -198,49 +191,17 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams,
                     null, localVarPathParams, contentType);
                 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
 
-                if (statusCode == 200) {
+                var payload = details["result"];
 
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                InvokeResponse invokeResponse = new InvokeResponse(payload["txId"].ToString(),
+                    payload["payload"].ToString());
 
-                    var details = JObject.Parse(data);
-                    var payload = details["payload"];
+                return invokeResponse;
 
-                    InvokeResponse invokeResponse = new InvokeResponse(payload["txId"].ToString(),
-                        payload["payload"].ToString());
-                    
-                    return invokeResponse;
-                    
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(),
-                        details["resultURL"].ToString());
-                    
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-                    
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-                    
-                    } catch(System.Exception e) {
-
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
-                }
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;
@@ -248,6 +209,7 @@ namespace XooaSDK.Client.Api {
                 Log.Error(xae);
                 throw xae;
             } catch (System.Exception e) {
+                Console.WriteLine(e.StackTrace);
                 Log.Error(e);
                 throw new XooaApiException(statusCode, e.Message);
             }
@@ -285,65 +247,34 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams,
                     null, localVarPathParams, contentType);
 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
 
-                if (statusCode == 200) {
+                var payload = details["result"];
+                var Attrs = payload["Attrs"];
 
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                List<attrs> attributes = new List<attrs>();
 
-                    var details = JObject.Parse(data);
-                    var payload = details["payload"];
-                    var Attrs = payload["Attrs"];
+                foreach(var attrObject in Attrs) {
 
-                    List<attrs> attributes = new List<attrs>();
+                    attrs attr = new attrs(attrObject["name"].ToString(), 
+                        attrObject["value"].ToString(), (bool) attrObject["ecert"]);
 
-                    foreach(var attrObject in Attrs) {
-
-                        attrs attr = new attrs(attrObject["name"].ToString(), 
-                            attrObject["value"].ToString(), (bool) attrObject["ecert"]);
-
-                        attributes.Add(attr);
-                    }
-
-                    IdentityResponse identityResponse = new IdentityResponse(
-                        payload["IdentityName"].ToString(),
-                        payload["Access"].ToString(),
-                        (bool) payload["canManageIdentities"],
-                        payload["createdAt"].ToString(),
-                        payload["ApiToken"].ToString(),
-                        payload["Id"].ToString(),
-                        attributes);
-                    
-                    return identityResponse;
-
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(),
-                        details["resultURL"].ToString());
-                    
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-                    
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
+                    attributes.Add(attr);
                 }
+
+                IdentityResponse identityResponse = new IdentityResponse(
+                    (payload["IdentityName"].ToString() != null) ? payload["IdentityName"].ToString() : "",
+                    (payload["Access"].ToString() != null) ? payload["Access"].ToString() : "",
+                    (bool) payload["canManageIdentities"],
+                    (payload["createdAt"].ToString() != null) ? payload["createdAt"].ToString() : "",
+                    (payload["ApiToken"].ToString() != null) ? payload["ApiToken"].ToString() : "",
+                    (payload["Id"].ToString() != null) ? payload["Id"].ToString() : "",
+                    attributes);
+
+                return identityResponse;
+                
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;
@@ -388,50 +319,19 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams,
                     null, localVarPathParams, contentType);
                 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
 
-                if (statusCode == 200) {
+                var payload = details["result"];
 
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                CurrentBlockResponse currentBlockResponse = new CurrentBlockResponse(
+                    payload["currentBlockHash"].ToString(),
+                    payload["previousBlockHash"].ToString(),
+                    (int) payload["blockNumber"]);
 
-                    var details = JObject.Parse(data);
-                    var payload = details["payload"];
+                return currentBlockResponse;
 
-                    CurrentBlockResponse currentBlockResponse = new CurrentBlockResponse(
-                        payload["currentBlockHash"].ToString(),
-                        payload["previousBlockHash"].ToString(),
-                        (int) payload["blockNumber"]);
-
-                    return currentBlockResponse;
-                    
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(),
-                        details["resultURL"].ToString());
-                    
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-                    
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-                        
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
-                }
             } catch (XooaApiException xae) {
                 Log.Error(xae);
                 throw xae;
@@ -476,51 +376,135 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams,
                     null, localVarPathParams, contentType);
 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
+                
+                var payload = details["result"];
 
-                if (statusCode == 200) {
+                BlockResponse blockResponse = new BlockResponse(
+                    payload["previous_hash"].ToString(),
+                    payload["data_hash"].ToString(),
+                    (int) payload["blockNumber"],
+                    (int) payload["numberOfTransactions"]);
 
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                return blockResponse;
+                
+            } catch (XooaRequestTimeoutException xrte) {
+                Log.Error(xrte);
+                throw xrte;
+            } catch (XooaApiException xae) {
+                Log.Error(xae);
+                throw xae;
+            } catch(System.Exception e) {
+                Log.Error(e);
+                throw new XooaApiException(statusCode, e.Message);
+            }
+        }
 
-                    var details = JObject.Parse(data);
-                    var payload = details["payload"];
+        public TransactionResponse getResultForTransaction(string resultId, string timeout = "3000") {
 
-                    BlockResponse blockResponse = new BlockResponse(
-                        payload["previous_hash"].ToString(),
-                        payload["data_hash"].ToString(),
-                        (int) payload["blockNumber"],
-                        (int) payload["numberOfTransactions"]);
-                    
-                    return blockResponse;
+            Log.Info("Invoking URL - " + XooaConstants.RESULT_URL);
 
-                } else if (statusCode == 202) {
+            var localVarPath = XooaConstants.RESULT_URL;
+            var contentType = XooaConstants.CONTENT_TYPE;
+            
+            var localVarQueryParameters = new List<KeyValuePair<string,string>>();
+            localVarQueryParameters.Add(new KeyValuePair<string, string>(XooaConstants.ASYNC, XooaConstants.FALSE));
+            localVarQueryParameters.Add(new KeyValuePair<string, string>(XooaConstants.TIMEOUT, timeout));
 
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
+            var localVarHeaderParams = new Dictionary<string, string>();
+            localVarHeaderParams.Add(XooaConstants.ACCEPT, XooaConstants.CONTENT_TYPE);
+            localVarHeaderParams.Add(XooaConstants.AUTHORIZATION, XooaConstants.TOKEN + ApiToken);
 
-                    var details = JObject.Parse(data);
+            var localVarPathParams = new Dictionary<string, string>();
+            localVarPathParams.Add("ResultId", resultId);
 
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(),
-                        details["resultURL"].ToString());
+            int statusCode = 0;
 
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-                    
-                    try {
-                        var details = JObject.Parse(data);
+            try {
+                RestRequest request = XooaSDK.Client.Util.Request.PrepareRequest(localVarPath,
+                    RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams,
+                    null, localVarPathParams, contentType);
 
-                        throw new XooaApiException(statusCode, details["error"].ToString());
+                IRestResponse response = RestClient.Execute(request);
 
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
+                JObject payload = XooaSDK.Client.Util.Request.GetData(response);
+                
+                var details = payload["result"];
+
+                string txnId = details["txid"].ToString();
+                string smartContract = details["smartcontract"].ToString();
+                string creatorMspId = details["creator_msp_id"].ToString();
+                string createdAt = details["createdt"].ToString();
+                string type = details["type"].ToString();
+                var endorserIds = details["endorser_msp_id"];
+                var readsets = details["read_set"];
+                var writesets = details["write_set"];
+
+                List<string> endorserMspIds = new List<string>();
+                List<ReadSet> readSetsList = new List<ReadSet>();
+                List<WriteSet> writeSetsList = new List<WriteSet>();
+
+                foreach (var id in endorserIds) {
+                    endorserMspIds.Add(id.ToString());
                 }
+
+                foreach (var set in readsets) {
+                    
+                    string chaincode = set["chaincode"].ToString();
+                    var readsubsets = set["set"];
+
+                    List<ReadSubSet> subSetsList = new List<ReadSubSet>();
+
+                    foreach (var subset in readsubsets) {
+
+                        string key = subset["key"].ToString();
+                        var vrsn = subset["version"];
+
+                        string blockNumber = vrsn["block_num"].ToString();
+                        string transactionNumber = vrsn["tx_num"].ToString();
+
+                        Response.Version version = new Response.Version(blockNumber, transactionNumber);
+
+                        ReadSubSet readSubSet = new ReadSubSet(key, version);
+
+                        subSetsList.Add(readSubSet);
+                    }
+
+                    ReadSet readSet = new ReadSet(chaincode, subSetsList);
+
+                    readSetsList.Add(readSet);
+                }
+
+
+                foreach(var set in writesets) {
+
+                    string chaincode = set["chaincode"].ToString();
+                    var writesubsets = set["set"];
+
+                    List<WriteSubSet> writeSubSetsList = new List<WriteSubSet>();
+
+                    foreach (var writesubset in writesubsets) {
+                        
+                        string key = set["key"].ToString();
+                        string value = set["value"].ToString();
+                        bool isDelete = (bool) set["is_delete"];
+
+                        WriteSubSet writeSubSet = new WriteSubSet(key, value, isDelete);
+
+                        writeSubSetsList.Add(writeSubSet);
+                    }
+
+                    WriteSet writeSet = new WriteSet(chaincode, writeSubSetsList);
+                    writeSetsList.Add(writeSet);
+                }
+
+                TransactionResponse transactionResponse = new TransactionResponse(txnId, smartContract, creatorMspId, endorserMspIds,
+                    type, createdAt, readSetsList, writeSetsList);
+
+                return transactionResponse;
+
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;

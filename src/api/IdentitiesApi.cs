@@ -1,3 +1,17 @@
+/// C# SDK for Xooa
+/// 
+/// Copyright 2018 Xooa
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+/// in compliance with the License. You may obtain a copy of the License at:
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+/// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+/// for the specific language governing permissions and limitations under the License.
+///
+/// Author: Kavi Sarna
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +28,7 @@ namespace XooaSDK.Client.Api {
     public interface IIdentitiesApi {
         
         /// <summary>
-        /// Get the current identity data with which the user is logged in.
+        /// This endpoint returns authenticated identity information
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -23,7 +37,8 @@ namespace XooaSDK.Client.Api {
         IdentityResponse currentIdentity(string timeout);
 
         /// <summary>
-        /// Get the list of all the identities available.
+        /// Get all identities from the identity registry
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -32,45 +47,67 @@ namespace XooaSDK.Client.Api {
         List<IdentityResponse> getIdentities(string timeout);
 
         /// <summary>
-        /// Enroll a new Identity with the app.
+        /// The Enroll identity endpoint is used to enroll new identities for the smart contract app. 
+        /// A success response includes the API Token generated for the identity. 
+        /// This API Token can be used to call API End points on behalf of the enrolled identity.
+        /// 
+        /// This endpoint provides equivalent functionality to adding new identity manually using Xooa console,
+        /// and identities added using this endpoint will appear, and can be managed,
+        /// using Xooa console under the identities tab of the smart contract app.
+        ///
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
-        /// <param name="identityRequest">Identity to enroll.</param>
+        /// <param name="IdentityRequest">Identity to Enroll.</param>
         /// <param name="timeout">Timeout interval for transaction.</param>
         /// <returns>IdentityResponse giving the data about the new Identity.</returns>
         IdentityResponse enrollIdentity(IdentityRequest identityRequest, string timeout);
 
         /// <summary>
-        /// Enroll a new Identity with the app in async mode.
+        /// The Enroll identity endpoint is used to enroll new identities for the smart contract app.
+        /// A success response includes the API Token generated for the identity.
+        /// This API Token can be used to call API End points on behalf of the enrolled identity.
+        ///
+        /// This endpoint provides equivalent functionality to adding new identity manually using Xooa console,
+        /// and identities added using this endpoint will appear, and can be managed,
+        /// using Xooa console under the identities tab of the smart contract app
+        ///
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
-        /// <param name="IdentityRequest">Identity to enroll.</param>
+        /// <param name="IdentityRequest">Identity Data to enroll.</param>
         /// <returns>PendingTransactionResponse giving the resultId of the pending transaction.</returns>
         PendingTransactionResponse enrollIdentityAsync(IdentityRequest identityRequest);
 
         /// <summary>
-        /// Regenerate the API token for the identity Id.
+        /// Generates new identity API Token.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
-        /// <param name="identityId">Identity Id to regenerate API Token for.</param>
+        /// <param name="IdentityId">Identity Id to regenerate API Token for.</param>
         /// <param name="timeout">Timeout interval for transaction.</param>
         /// <returns>IdentityResponse giving the data about the new Api Token for the Identity.</returns>
         IdentityResponse regenerateIdentityApiToken(string identityId, string timeout);
 
         /// <summary>
-        /// Get the identity data.
+        /// Get the specified identity from the identity registry.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
-        /// <param name="IdentityId">Identity Id to get data about.</param>
+        /// <param name="IdentityId">Identity Id to get data for.</param>
         /// <param name="timeout">Timeout interval for transaction.</param>
         /// <returns>IdentityResponse giving the data about the Identity.</returns>
         IdentityResponse getIdentity(string identityId, string timeout);
 
         /// <summary>
-        /// Delete the identity.
+        /// Deletes an identity.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -105,7 +142,7 @@ namespace XooaSDK.Client.Api {
         }
 
         /// <summary>
-        /// Get the current identity data with which the user is logged in.
+        /// This endpoint returns authenticated identity information
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -132,61 +169,33 @@ namespace XooaSDK.Client.Api {
                 RestRequest request = XooaSDK.Client.Util.Request.PrepareRequest(localVarPath,
                     RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams,
                     null, null, contentType);
-
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
-
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
-
-                if (statusCode == 200) {
-
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                
+                IRestResponse response = RestClient.Execute(request);
+                Console.WriteLine(response.Content);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
+                
+                var Attrs = details["Attrs"];
+                
+                List<attrs> attributes = new List<attrs>();
+                foreach(var attrObject in Attrs) {
                     
-                    var details = JObject.Parse(data);
-                    var Attrs = details["Attrs"];
-
-                    List<attrs> attributes = new List<attrs>();
-
-                    foreach(var attrObject in Attrs) {
-
-                        attrs attr = new attrs(attrObject["name"].ToString(),
-                            attrObject["value"].ToString(), (bool) attrObject["ecert"]);
-                        
-                        attributes.Add(attr);
-                    }
-
-                    IdentityResponse identityResponse = new IdentityResponse(
-                        details["IdentityName"].ToString(), details["Access"].ToString(),
-                        (bool) details["canManageIdentities"], details["createdAt"].ToString(),
-                        details["ApiToken"].ToString(), details["Id"].ToString(),
-                        attributes);
+                    attrs attr = new attrs(attrObject["name"].ToString(),
+                        attrObject["value"].ToString(), (bool) attrObject["ecert"]);
                     
-                    return identityResponse;
-
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(), details["resultURL"].ToString());
-
-                } else {
-
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
+                    attributes.Add(attr);
                 }
+                
+                IdentityResponse identityResponse = new IdentityResponse(
+                    (details["IdentityName"] != null) ? details["IdentityName"].ToString() : "",
+                    (details["Access"] != null) ? details["Access"].ToString() : "",
+                    (bool) details["canManageIdentities"],
+                    (details["createdAt"] != null) ? details["createdAt"].ToString() : "",
+                    (details["ApiToken"] != null) ? details["ApiToken"].ToString() : "",
+                    (details["Id"] != null) ? details["Id"].ToString() : "",
+                    attributes);
+                
+                return identityResponse;
+
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;
@@ -194,13 +203,15 @@ namespace XooaSDK.Client.Api {
                 Log.Error(xae);
                 throw xae;
             } catch (System.Exception e) {
+                Console.WriteLine(e.StackTrace);
                 Log.Error(e);
                 throw new XooaApiException(statusCode, e.Message);
             }
         }
 
         /// <summary>
-        /// Get the list of all the identities available.
+        /// Get all identities from the identity registry
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -228,7 +239,8 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams,
                     null, null, contentType);
                 
-                var response = RestClient.Execute(request);
+                IRestResponse response = RestClient.Execute(request);
+                
                 statusCode = (int) response.StatusCode;
                 var data = response.Content;
 
@@ -249,7 +261,6 @@ namespace XooaSDK.Client.Api {
                             identity["IdentityName"].ToString(),
                             (bool) identity["canManageIdentities"],
                             identity["createdAt"].ToString(),
-                            identity["ApiToken"].ToString(),
                             identity["Id"].ToString());
                         
                         identityResponses.Add(identityResponse);
@@ -292,11 +303,19 @@ namespace XooaSDK.Client.Api {
         }
 
         /// <summary>
-        /// Enroll a new Identity with the app.
+        /// The Enroll identity endpoint is used to enroll new identities for the smart contract app. 
+        /// A success response includes the API Token generated for the identity. 
+        /// This API Token can be used to call API End points on behalf of the enrolled identity.
+        /// 
+        /// This endpoint provides equivalent functionality to adding new identity manually using Xooa console,
+        /// and identities added using this endpoint will appear, and can be managed,
+        /// using Xooa console under the identities tab of the smart contract app.
+        ///
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
-        /// <param name="IdentityRequest">Identity to enroll.</param>
+        /// <param name="IdentityRequest">Identity to Enroll.</param>
         /// <param name="timeout">Timeout interval for transaction.</param>
         /// <returns>IdentityResponse giving the data about the new Identity.</returns>
         public IdentityResponse enrollIdentity(IdentityRequest identityRequest, string timeout = "3000") {
@@ -315,7 +334,7 @@ namespace XooaSDK.Client.Api {
             localVarHeaderParams.Add(XooaConstants.AUTHORIZATION, XooaConstants.TOKEN + ApiToken);
 
             string jsonBody = identityRequest.toString();
-
+            
             int statusCode = 0;
 
             try {
@@ -323,63 +342,34 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.POST, localVarQueryParameters, jsonBody, localVarHeaderParams,
                     null, null, contentType);
                 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
-
-                if (statusCode == 200) {
-
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
-                    
-                    var details = JObject.Parse(data);
-                    var Attrs = details["Attrs"];
-
-                    List<attrs> attributes = new List<attrs>();
-
-                    foreach(var attrObject in Attrs) {
-
-                        attrs attr = new attrs(attrObject["name"].ToString(),
-                            attrObject["value"].ToString(), (bool) attrObject["ecert"]);
-
-                        attributes.Add(attr);
-                    }
-
-                    IdentityResponse identityResponse = new IdentityResponse(
-                        details["IdentityName"].ToString(),
-                        details["Access"].ToString(),
-                        (bool) details["canManageIdentities"],
-                        details["createdAt"].ToString(),
-                        details["ApiToken"].ToString(),
-                        details["Id"].ToString(),
-                        attributes);
-                    
-                    return identityResponse;
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
                 
-                } else if (statusCode == 202) {
+                var Attrs = details["Attrs"];
+                
+                List<attrs> attributes = new List<attrs>();
 
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
+                
+                foreach(var attrObject in Attrs) {
 
-                    var details = JObject.Parse(data);
+                    attrs attr = new attrs(attrObject["name"].ToString(),
+                        attrObject["value"].ToString(), (bool) attrObject["ecert"]);
 
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(), details["resultURL"].ToString());
-
-                } else {
-
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
+                    attributes.Add(attr);
                 }
+
+                IdentityResponse identityResponse = new IdentityResponse(
+                    (details["IdentityName"] != null) ? details["IdentityName"].ToString() : "",
+                    (details["Access"] != null) ? details["Access"].ToString() : "",
+                    (bool) details["canManageIdentities"],
+                    (details["createdAt"] != null) ? details["createdAt"].ToString() : "",
+                    (details["ApiToken"] != null) ? details["ApiToken"].ToString() : "",
+                    (details["Id"] != null) ? details["Id"].ToString() : "",
+                    attributes);
+
+                return identityResponse;
+                
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;
@@ -393,10 +383,18 @@ namespace XooaSDK.Client.Api {
         }
 
         /// <summary>
-        /// Enroll a new Identity with the app in async mode.
+        /// The Enroll identity endpoint is used to enroll new identities for the smart contract app.
+        /// A success response includes the API Token generated for the identity.
+        /// This API Token can be used to call API End points on behalf of the enrolled identity.
+        ///
+        /// This endpoint provides equivalent functionality to adding new identity manually using Xooa console,
+        /// and identities added using this endpoint will appear, and can be managed,
+        /// using Xooa console under the identities tab of the smart contract app
+        ///
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
-        /// <param name="IdentityId">Identity to enroll.</param>
+        /// <param name="IdentityRequest">Identity Data to enroll.</param>
         /// <returns>PendingTransactionResponse giving the resultId of the pending transaction.</returns>
         public PendingTransactionResponse enrollIdentityAsync(IdentityRequest identityRequest) {
 
@@ -406,16 +404,12 @@ namespace XooaSDK.Client.Api {
             var contentType = XooaConstants.CONTENT_TYPE;
             
             var localVarQueryParameters = new List<KeyValuePair<string,string>>();
-            //localVarQueryParameters.Add(new KeyValuePair<string, string>("args", args));
             localVarQueryParameters.Add(new KeyValuePair<string, string>(XooaConstants.ASYNC, XooaConstants.TRUE));
             localVarQueryParameters.Add(new KeyValuePair<string, string>(XooaConstants.TIMEOUT, "1000"));
 
             var localVarHeaderParams = new Dictionary<string, string>();
             localVarHeaderParams.Add(XooaConstants.ACCEPT, XooaConstants.CONTENT_TYPE);
             localVarHeaderParams.Add(XooaConstants.AUTHORIZATION, XooaConstants.TOKEN + ApiToken);
-
-            // var localVarPathParams = new Dictionary<string, string>();
-            //localVarPathParams.Add("fcn", functionName);
 
             string jsonBody = identityRequest.toString();
 
@@ -426,38 +420,15 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.POST, localVarQueryParameters, jsonBody, localVarHeaderParams,
                     null, null, contentType);
                 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.ExecuteTaskAsync(request).Result;
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.getDataAsync(response);
 
-                if (statusCode == 200) {
+                PendingTransactionResponse pendingTransactionResponse = new PendingTransactionResponse(
+                    details["resultId"].ToString(), details["resultURL"].ToString());
 
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                return pendingTransactionResponse;
 
-                    var details = JObject.Parse(data);
-
-                    PendingTransactionResponse pendingTransactionResponse = new PendingTransactionResponse(
-                        details["resultId"].ToString(), details["resultURL"].ToString());
-
-                    return pendingTransactionResponse;
-
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-                    
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
-                }
             } catch (XooaApiException xae) {
                 Log.Error(xae);
                 throw xae;
@@ -468,7 +439,9 @@ namespace XooaSDK.Client.Api {
         }
 
         /// <summary>
-        /// Regenerate the API token for the identity Id.
+        /// Generates new identity API Token.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -500,60 +473,33 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.POST, localVarQueryParameters, null, localVarHeaderParams,
                     null, localVarPathParams, contentType);
 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
 
-                if (statusCode == 200) {
+                var Attrs = details["Attrs"];
 
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                List<attrs> attributes = new List<attrs>();
 
-                    var details = JObject.Parse(data);
-                    var Attrs = details["Attrs"];
+                foreach(var attrObject in Attrs) {
 
-                    List<attrs> attributes = new List<attrs>();
+                    attrs attr = new attrs(attrObject["name"].ToString(), 
+                        attrObject["value"].ToString(), (bool) attrObject["ecert"]);
 
-                    foreach(var attrObject in Attrs) {
-
-                        attrs attr = new attrs(attrObject["name"].ToString(), 
-                            attrObject["value"].ToString(), (bool) attrObject["ecert"]);
-
-                        attributes.Add(attr);
-                    }
-
-                    IdentityResponse identityResponse = new IdentityResponse(
-                        details["IdentityName"].ToString(), details["Access"].ToString(),
-                        (bool) details["canManageIdentities"], details["createdAt"].ToString(),
-                        details["ApiToken"].ToString(), details["Id"].ToString(),
-                        attributes);
-                    
-                    return identityResponse;
-                
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(), details["resultURL"].ToString());
-
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
+                    attributes.Add(attr);
                 }
+
+                IdentityResponse identityResponse = new IdentityResponse(
+                    (details["IdentityName"] != null) ? details["IdentityName"].ToString() : "",
+                    (details["Access"] != null) ? details["Access"].ToString() : "",
+                    (bool) details["canManageIdentities"],
+                    (details["createdAt"] != null) ? details["createdAt"].ToString() : "",
+                    (details["ApiToken"] != null) ? details["ApiToken"].ToString() : "",
+                    (details["Id"] != null) ? details["Id"].ToString() : "",
+                    attributes);
+                    
+                return identityResponse;
+                
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;
@@ -567,7 +513,9 @@ namespace XooaSDK.Client.Api {
         }
 
         /// <summary>
-        /// Get the identity data.
+        /// Get the specified identity from the identity registry.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -599,60 +547,35 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.GET, localVarQueryParameters, null, localVarHeaderParams,
                     null, localVarPathParams, contentType);
 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
 
-                if (statusCode == 200) {
+                Console.WriteLine(details);
 
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
+                var Attrs = details["Attrs"];
 
-                    var details = JObject.Parse(data);
-                    var Attrs = details["Attrs"];
+                List<attrs> attributes = new List<attrs>();
 
-                    List<attrs> attributes = new List<attrs>();
+                foreach(var attrObject in Attrs) {
 
-                    foreach(var attrObject in Attrs) {
+                    attrs attr = new attrs(attrObject["name"].ToString(),
+                        attrObject["value"].ToString(), (bool) attrObject["ecert"]);
 
-                        attrs attr = new attrs(attrObject["name"].ToString(),
-                            attrObject["value"].ToString(), (bool) attrObject["ecert"]);
-                        
-                        attributes.Add(attr);
-                    }
-
-                    IdentityResponse identityResponse = new IdentityResponse(
-                        details["IdentityName"].ToString(), details["Access"].ToString(),
-                        (bool) details["canManageIdentities"], details["createdAt"].ToString(),
-                        details["ApiToken"].ToString(), details["Id"].ToString(),
-                        attributes);
-
-                    return identityResponse;
-
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(), details["resultURL"].ToString());
-
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-                    
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
+                    attributes.Add(attr);
                 }
+
+                IdentityResponse identityResponse = new IdentityResponse(
+                    (details["IdentityName"] != null) ? details["IdentityName"].ToString() : "",
+                    (details["Access"] != null) ? details["Access"].ToString() : "",
+                    (bool) details["canManageIdentities"],
+                    (details["createdAt"] != null) ? details["createdAt"].ToString() : "",
+                    (details["ApiToken"] != null) ? details["ApiToken"].ToString() : "",
+                    (details["Id"] != null) ? details["Id"].ToString() : "",
+                    attributes);
+
+                return identityResponse;
+
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;
@@ -666,7 +589,9 @@ namespace XooaSDK.Client.Api {
         }
 
         /// <summary>
-        /// Delete the identity.
+        /// Deletes an identity.
+        /// 
+        /// Required permission: manage identities (canManageIdentities=true)
         /// </summary>
         /// <exception cref="Xooa.Client.Exception.XooaApiException">Thrown when fails to make API call</exception>
         /// <exception cref="Xooa.Client.Exception.XooaRequestTimeoutException">Thrown when a 202 response is recieved.</exception>
@@ -698,43 +623,12 @@ namespace XooaSDK.Client.Api {
                     RestSharp.Method.DELETE, localVarQueryParameters, null, localVarHeaderParams,
                     null, localVarPathParams, contentType);
                 
-                var response = RestClient.Execute(request);
-                statusCode = (int) response.StatusCode;
-                var data = response.Content;
+                IRestResponse response = RestClient.Execute(request);
 
-                Log.Debug("Status Code - " + statusCode);
-                Log.Debug("Response - " + data);
+                JObject details = XooaSDK.Client.Util.Request.GetData(response);
 
-                if (statusCode == 200) {
-
-                    Log.Info("Received a 200 Response from Blockchain. Processing...");
-
-                    var details = JObject.Parse(data);
-
-                    return details["deleted"].ToString();
-
-                } else if (statusCode == 202) {
-
-                    Log.Info("Received a PendingTransactionResponse, throwing XooaRequestTimeoutException");
-
-                    var details = JObject.Parse(data);
-
-                    throw new XooaRequestTimeoutException(details["resultId"].ToString(), details["resultURL"].ToString());
-
-                } else {
-                    
-                    Log.Info("Received an error response from Blockchain - " + statusCode);
-                    
-                    try {
-                        var details = JObject.Parse(data);
-
-                        throw new XooaApiException(statusCode, details["error"].ToString());
-                    
-                    } catch (System.Exception e) {
-                        e.ToString();
-                        throw new XooaApiException(statusCode, data);
-                    }
-                }
+                return details["deleted"].ToString();
+                
             } catch (XooaRequestTimeoutException xrte) {
                 Log.Error(xrte);
                 throw xrte;

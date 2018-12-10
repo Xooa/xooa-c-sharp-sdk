@@ -1,10 +1,28 @@
+/// C# SDK for Xooa
+/// 
+/// Copyright 2018 Xooa
+///
+/// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+/// in compliance with the License. You may obtain a copy of the License at:
+/// http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+/// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+/// for the specific language governing permissions and limitations under the License.
+///
+/// Author: Kavi Sarna
+
 using System;
+using System.Threading.Tasks;
+using System.Net;
 using NUnit.Framework;
 using XooaSDK.Client;
 using XooaSDK.Client.Api;
 using XooaSDK.Client.Exception;
 using XooaSDK.Client.Response;
 using XooaSDK.Client.Util;
+using RestSharp;
+using Moq;
 
 namespace XooaSDK.Test.Api {
 
@@ -18,10 +36,9 @@ namespace XooaSDK.Test.Api {
             xooaClient.setApiToken(XooaConstants.API_TOKEN);
 
             try {
+
                 CurrentBlockResponse cbr = xooaClient.getCurrentBlock();
 
-                //Assert.AreEqual(typeof(CurrentBlockResponse), cbr.GetType());
-
                 Assert.IsNotEmpty(cbr.getBlockNumber().ToString());
 
                 Assert.IsNotEmpty(cbr.getCurrentBlockHash());
@@ -35,49 +52,6 @@ namespace XooaSDK.Test.Api {
                 Assert.IsNotEmpty(xrte.getResultId());
 
                 Assert.IsNotEmpty(xrte.getResultUrl());
-
-            } catch (XooaApiException xae) {
-
-                //Assert.AreEqual(typeof(XooaApiException), xae.GetType());
-
-                Assert.IsNotEmpty(xae.getErrorCode().ToString());
-
-                Assert.IsNotEmpty(xae.getErrorMessage());
-            }
-        }
-
-        [Test]
-        public void testGetCurrentBlockResponseTimeout() {
-            
-            XooaClient xooaClient = new XooaClient();
-            xooaClient.setApiToken(XooaConstants.API_TOKEN);
-
-            try {
-                CurrentBlockResponse cbr = xooaClient.getCurrentBlock("200");
-
-                //Assert.AreEqual(typeof(CurrentBlockResponse), cbr.GetType());
-
-                Assert.IsNotEmpty(cbr.getBlockNumber().ToString());
-
-                Assert.IsNotEmpty(cbr.getCurrentBlockHash());
-
-                Assert.IsNotEmpty(cbr.getPreviousBlockHash());
-
-            } catch (XooaRequestTimeoutException xrte) {
-
-                //Assert.AreEqual(typeof(XooaRequestTimeoutException), xrte.GetType());
-
-                Assert.IsNotEmpty(xrte.getResultId());
-
-                Assert.IsNotEmpty(xrte.getResultUrl());
-
-            } catch (XooaApiException xae) {
-
-                //Assert.AreEqual(typeof(XooaApiException), xae.GetType());
-
-                Assert.IsNotEmpty(xae.getErrorCode().ToString());
-
-                Assert.IsNotEmpty(xae.getErrorMessage());
             }
         }
 
@@ -87,22 +61,14 @@ namespace XooaSDK.Test.Api {
             XooaClient xooaClient = new XooaClient();
             xooaClient.setApiToken(XooaConstants.API_TOKEN);
 
-            try {
-                PendingTransactionResponse ptr = xooaClient.getCurrentBlockAsync();
+            PendingTransactionResponse ptr = xooaClient.getCurrentBlockAsync();
 
-                //Assert.AreEqual(typeof(PendingTransactionResponse), ptr.GetType());
+            ptr.display();
 
-                Assert.IsNotEmpty(ptr.getResultId());
+            Assert.IsNotEmpty(ptr.getResultId());
 
-            } catch (XooaApiException xae) {
+            Assert.IsNotEmpty(ptr.getResultUrl());
 
-                //Assert.AreEqual(typeof(XooaApiException), xae.GetType());
-
-                Assert.IsNotEmpty(xae.getErrorCode().ToString());
-
-                Assert.IsNotEmpty(xae.getErrorMessage());
-            }
-            
         }
 
         [Test]
@@ -111,75 +77,26 @@ namespace XooaSDK.Test.Api {
             XooaClient xooaClient = new XooaClient();
             xooaClient.setApiToken(XooaConstants.API_TOKEN);
 
-            string blockNumber = "1";
-
             try {
-                BlockResponse br = xooaClient.getBlockByNumber(blockNumber);
+                
+                BlockResponse br = xooaClient.getBlockByNumber("10");
 
-                //Assert.AreEqual(typeof(BlockResponse), br.GetType());
-
-                Assert.AreEqual(blockNumber, br.getBlockNumber());
+                Assert.IsNotNull(br.getBlockNumber());
 
                 Assert.IsNotEmpty(br.getDataHash());
 
                 Assert.IsNotEmpty(br.getPreviousHash());
 
-                Assert.IsNotEmpty(br.getNumberOfTransactions().ToString());
+                Assert.IsNotNull(br.getNumberOfTransactions());
+
+                Assert.AreEqual(10, br.getBlockNumber(), "Block Numbers do not match");
 
             } catch (XooaRequestTimeoutException xrte) {
-
-                //Assert.AreEqual(typeof(XooaRequestTimeoutException), xrte.GetType());
 
                 Assert.IsNotEmpty(xrte.getResultId());
 
                 Assert.IsNotEmpty(xrte.getResultUrl());
 
-            } catch (XooaApiException xae) {
-                
-                //Assert.AreEqual(typeof(XooaApiException), xae.GetType());
-
-                Assert.IsNotEmpty(xae.getErrorCode().ToString());
-
-                Assert.IsNotEmpty(xae.getErrorMessage());
-            }
-        }
-
-        [Test]
-        public void testGetBlockByNumberTimeout() {
-
-            XooaClient xooaClient = new XooaClient();
-            xooaClient.setApiToken(XooaConstants.API_TOKEN);
-
-            string blockNumber = "1";
-
-            try {
-                BlockResponse br = xooaClient.getBlockByNumber(blockNumber, "200");
-
-                //Assert.AreEqual(typeof(BlockResponse), br.GetType());
-
-                Assert.AreEqual(blockNumber, br.getBlockNumber());
-
-                Assert.IsNotEmpty(br.getDataHash());
-
-                Assert.IsNotEmpty(br.getPreviousHash());
-
-                Assert.IsNotEmpty(br.getNumberOfTransactions().ToString());
-
-            } catch (XooaRequestTimeoutException xrte) {
-
-                //Assert.AreEqual(typeof(XooaRequestTimeoutException), xrte.GetType());
-
-                Assert.IsNotEmpty(xrte.getResultId());
-
-                Assert.IsNotEmpty(xrte.getResultUrl());
-
-            } catch (XooaApiException xae) {
-                
-                //Assert.AreEqual(typeof(XooaApiException), xae.GetType());
-
-                Assert.IsNotEmpty(xae.getErrorCode().ToString());
-
-                Assert.IsNotEmpty(xae.getErrorMessage());
             }
         }
 
@@ -189,23 +106,55 @@ namespace XooaSDK.Test.Api {
             XooaClient xooaClient = new XooaClient();
             xooaClient.setApiToken(XooaConstants.API_TOKEN);
 
-            string blockNumber = "1";
+            PendingTransactionResponse ptr = xooaClient.getBlockByNumberAsync("10");
+            ptr.display();
+            Assert.IsNotEmpty(ptr.getResultId());
+
+            Assert.IsNotEmpty(ptr.getResultUrl());
+
+        }
+
+        [Test]
+        public void testGetTransactionByTransactionId() {
+
+            XooaClient xooaClient = new XooaClient();
+            xooaClient.setApiToken(XooaConstants.API_TOKEN);
 
             try {
-                PendingTransactionResponse ptr = xooaClient.getBlockByNumberAsync(blockNumber);
-
-                //Assert.AreEqual(typeof(PendingTransactionResponse), ptr.GetType());
-
-                Assert.IsNotEmpty(ptr.getResultId());
-
-            } catch (XooaApiException xae) {
                 
-                //Assert.AreEqual(typeof(XooaApiException), xae.GetType());
+                TransactionResponse br = xooaClient.getTransactionByTransactionId("1159c90618cc535338e8dfb39fc86800405ff9c082f7011808d4307a3104ef8d");
 
-                Assert.IsNotEmpty(xae.getErrorCode().ToString());
+                Assert.IsNotEmpty(br.getTransactionId());
 
-                Assert.IsNotEmpty(xae.getErrorMessage());
+                Assert.IsNotEmpty(br.getCreatorMspId());
+
+                Assert.IsNotEmpty(br.getSmartContract());
+
+                Assert.IsNotEmpty(br.getType());
+
+                Assert.AreEqual("10", br.getTransactionId(), "Transaction IDs do not match");
+
+            } catch (XooaRequestTimeoutException xrte) {
+
+                Assert.IsNotEmpty(xrte.getResultId());
+
+                Assert.IsNotEmpty(xrte.getResultUrl());
+
             }
+        }
+
+        [Test]
+        public void testGetTransactionByTransactionIdAsync() {
+
+            XooaClient xooaClient = new XooaClient();
+            xooaClient.setApiToken(XooaConstants.API_TOKEN);
+
+            PendingTransactionResponse ptr = xooaClient.getTransactionByTransactionIdAsync("1159c90618cc535338e8dfb39fc86800405ff9c082f7011808d4307a3104ef8d");
+
+            Assert.IsNotEmpty(ptr.getResultId());
+
+            Assert.IsNotEmpty(ptr.getResultUrl());
+
         }
     }
 }

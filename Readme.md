@@ -311,31 +311,31 @@ Throws -
 [XooaApiException](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/exceptions/XooaApiException.cs) - Instance of XooaApiException giving the error code and error message.
 
 
-##### getTransactionByTransactionId(transactionId, timeout = "4000")
-```Ruby
-    def getTransactionByTransactionId(transactionId, timeout = "4000")
+##### getTransactionByTransactionId(string transactionId, string timeout)
+```csharp
+    public TransactionResponse getTransactionByTransactionId(string transactionId, string timeout = "3000")
 ```
 Method to get the transaction details for the transaction id. For more details refer [Get Transaction By TransactionId](https://api.xooa.com/explorer/#!/Ledger/BlockData_0).
 
 Return - TransactionResponse
-Instance of [TransactionResponse](https://github.com/Xooa/xooa-ruby-sdk/blob/master/lib/ruby/client/response/TransactionResponse.rb) giving the details about the transaction.
+Instance of [TransactionResponse](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/response/TransactionResponse.cs) giving the details about the transaction.
 
 Throws - 
-[XooaApiException](https://github.com/Xooa/xooa-ruby-sdk/blob/master/lib/ruby/client/exception/XooaApiException.rb) - Instance of XooaApiException giving the error code and error message.
-[XooaRequestTimeoutException](https://github.com/Xooa/xooa-ruby-sdk/blob/master/lib/ruby/client/exception/XooaRequestTimeoutException.rb) - Instance of XooaRequestTimeoutException giving result id and result url for pending transaction.
+[XooaApiException](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/exceptions/XooaApiException.cs) - Instance of XooaApiException giving the error code and error message.
+[XooaRequestTimeoutException](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/exceptions/XooaRequestTimeoutException.cs) - Instance of XooaRequestTimeoutException giving result id and result url for pending transaction.
 
 
-##### getTransactionByTransactionIdAsync(transactionId)
-```Ruby
-    def getTransactionByTransactionIdAsync(transactionId)
+##### getTransactionByTransactionIdAsync(string transactionId)
+```csharp
+    public PendingTransactionResponse getTransactionByTransactionIdAsync(string transactionId)
 ```
 Method to get the transaction details for the transaction id in async mode. For more details refer [Get Transaction By TransactionId](https://api.xooa.com/explorer/#!/Ledger/BlockData_0).
 
 Return - PendingTransactionResponse
-Instance of [PendingTransactionResponse](https://github.com/Xooa/xooa-ruby-sdk/blob/master/lib/ruby/client/response/PendingTransactionResponse.rb) giving result id and result url for pending transaction.
+Instance of [PendingTransactionResponse](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/response/PendingTransactionResponse.cs) giving result id and result url for pending transaction.
 
 Throws - 
-[XooaApiException](https://github.com/Xooa/xooa-ruby-sdk/blob/master/lib/ruby/client/exception/XooaApiException.rb) - Instance of XooaApiException giving the error code and error message.
+[XooaApiException](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/exceptions/XooaApiException.cs) - Instance of XooaApiException giving the error code and error message.
 
 
 
@@ -409,15 +409,15 @@ Throws -
 [XooaRequestTimeoutException](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/exceptions/XooaRequestTimeoutException.cs) - Instance of XooaRequestTimeoutException giving result id and result url for pending transaction.
 
 
-##### getResultForTransaction(resultId, timeout = "4000")
-```Ruby
-    def getResultForTransaction(resultId, timeout = "4000")
+##### getResultForTransaction(string resultId, string timeout)
+```csharp
+    public TransactionResponse getResultForTransaction(string resultId, string timeout = "3000")
 ```
 Method to get TransactionResponse for a request in pending state. For more detials refer [Result API](https://api.xooa.com/explorer/#!/Result/Result).
 
 Return - TransactionResponse
-Instance of [TransactionResponse](https://github.com/Xooa/xooa-ruby-sdk/blob/master/lib/ruby/client/response/TransactionResponse.rb) giving the transaction details for the transaction id.
+Instance of [TransactionResponse](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/response/TransactionResponse.cs) giving the transaction details for the transaction id.
 
 Throws - 
-[XooaApiException](https://github.com/Xooa/xooa-ruby-sdk/blob/master/lib/ruby/client/exception/XooaApiException.rb) - Instance of XooaApiException giving the error code and error message.
-[XooaRequestTimeoutException](https://github.com/Xooa/xooa-ruby-sdk/blob/master/lib/ruby/client/exception/XooaRequestTimeoutException.rb) - Instance of XooaRequestTimeoutException giving result id and result url for pending transaction.
+[XooaApiException](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/exceptions/XooaApiException.cs) - Instance of XooaApiException giving the error code and error message.
+[XooaRequestTimeoutException](https://github.com/Xooa/xooa-c-sharp-sdk/blob/master/src/exceptions/XooaRequestTimeoutException.cs) - Instance of XooaRequestTimeoutException giving result id and result url for pending transaction.
